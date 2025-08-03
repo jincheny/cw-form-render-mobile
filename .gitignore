@@ -1,0 +1,63 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/npm-debug.log*
+/yarn-error.log
+/yarn.lock
+/package-lock.json
+
+*/*/yarn-error.log
+
+.yarn
+.turbo/cookies
+.turbo/daemon
+.turbo
+
+# turbo
+*/*/.turbo
+
+
+# production
+/dist
+/lib
+/docs-dist
+# misc
+.idea
+.DS_Store
+.idea
+.vscode
+
+# umi
+.dumi/tmp
+.dumi-production
+.dumi-test
+.env.local
+
+# lerna
+node_modules
+
+/.local
+
+/es
+/*/es
+/*/lib
+/*/.local
+/*/dist
+
+/widgets/*/es
+/widgets/*/lib
+/widgets/*/.local
+/widgets/*/dist
+
+/tools/*/es
+/tools/*/lib
+/tools/*/.local
+/tools/*/dist
+
+# custom
+old-doc
+test.json
+/docs/guide/.test
+
+/coverage
