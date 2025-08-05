@@ -1,5 +1,5 @@
 import React from 'react';
-import { 
+import {
   Input as AntdInput,
   Slider as AntdSlider,
   TextArea as AntdTextArea,
@@ -12,7 +12,7 @@ import { omit } from 'lodash-es';
 
 const widgetHoc = (Widget: any) => (props: any) => {
   const widgetProps = omit(props, ['addons', 'schema']);
-  return <Widget {...widgetProps} />
+  return <Widget {...widgetProps} />;
 };
 
 export const Input = widgetHoc(AntdInput);

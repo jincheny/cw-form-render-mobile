@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from 'antd-mobile';
 import { FRContext } from '../../models/context';
-import {useStore} from 'zustand'
+import { useStore } from 'zustand';
 import cx from 'classnames';
 
 import './index.less';
@@ -20,28 +20,21 @@ const BoxCard = (props: any) => {
   let titleNode = (
     <>
       {title && <span className={`${prefix}-title`}>{title}</span>}
-      {description && (
-        <span className={`${prefix}-desc`}>
-          {description}
-        </span>
-      )}
+      {description && <span className={`${prefix}-desc`}>{description}</span>}
     </>
-  )
+  );
 
   const noTitle = !title && !description;
 
   const className = cx(prefix, {
     [`${prefix}-no-title`]: noTitle,
-  })
-  
+  });
+
   return (
-    <Card
-      className={className}
-      title={noTitle ? null : titleNode}
-    >
+    <Card className={className} title={noTitle ? null : titleNode}>
       {children}
     </Card>
   );
-}
+};
 
 export default BoxCard;

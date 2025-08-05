@@ -11,5 +11,5 @@ export default (props: any) => {
       <div className={`${prefix}-title`}>{title}</div>
       {children}
     </div>
-  )
-}
+  );
+};

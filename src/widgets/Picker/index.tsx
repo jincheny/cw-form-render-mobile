@@ -1,11 +1,11 @@
-import React, { useRef, useImperativeHandle} from 'react';
+import React, { useRef, useImperativeHandle } from 'react';
 import { Picker } from 'antd-mobile';
 import { omit } from 'lodash-es';
 
 export default (props: any) => {
-  const { 
-    value, 
-    onChange, 
+  const {
+    value,
+    onChange,
     placeholder = '请选择',
     options,
     columns,
@@ -13,10 +13,10 @@ export default (props: any) => {
   } = omit(props, ['addons', 'schema']);
 
   const pickerRef: any = useRef(null);
-  
+
   // 使用useImperativeHandle暴露方法给外部
   useImperativeHandle(props.addons.fieldRef, () => ({
-    ...pickerRef?.current
+    ...pickerRef?.current,
   }));
 
   // 只有一列的场景更多，这里兼容下
@@ -24,7 +24,7 @@ export default (props: any) => {
     if (columns && columns.length > 0) {
       return columns;
     } else {
-      return [options]
+      return [options];
     }
   }, [options, columns]);
 
@@ -38,11 +38,11 @@ export default (props: any) => {
     >
       {items => {
         if (items.every(i => i === null)) {
-          return <span style={{color: '#ccc'}}>{placeholder}</span>;
+          return <span style={{ color: '#ccc' }}>{placeholder}</span>;
         } else {
-          return items.map(i => i?.label ?? '未选择').join('-')
+          return items.map(i => i?.label ?? '未选择').join('-');
         }
       }}
     </Picker>
-  )
-}
+  );
+};

@@ -4,7 +4,7 @@ import type { FormProps as AntdFormProps } from 'antd-mobile';
 import type { ConfigProviderProps } from 'antd-mobile/es/components/config-provider';
 // import type { ConfigProviderProps } from 'antd/es/config-provider';
 
-type AntdFormInstance = Exclude<AntdFormProps['form'], undefined>
+type AntdFormInstance = Exclude<AntdFormProps['form'], undefined>;
 
 export type { RuleItem } from 'async-validator';
 export type SchemaType =
@@ -25,16 +25,16 @@ export interface SchemaBase {
   description?: string;
   descType?: 'text' | 'icon';
   format?:
-  | 'image'
-  | 'textarea'
-  | 'color'
-  | 'email'
-  | 'url'
-  | 'dateTime'
-  | 'date'
-  | 'time'
-  | 'upload'
-  | (string & {});
+    | 'image'
+    | 'textarea'
+    | 'color'
+    | 'email'
+    | 'url'
+    | 'dateTime'
+    | 'date'
+    | 'time'
+    | 'upload'
+    | (string & {});
   default?: any;
   /** 是否必填，支持 `'{{ formData.xxx === "" }}'` 形式的表达式 */
   required?: boolean | string;
@@ -124,7 +124,7 @@ export interface ListOperate {
 }
 
 export interface GlobalConfig {
-  listOperate: ListOperate
+  listOperate: ListOperate;
 }
 
 export interface FormInstance extends AntdFormInstance {
@@ -188,11 +188,11 @@ export interface FormInstance extends AntdFormInstance {
 
 export type WatchProperties = {
   [path: string]:
-  | {
-    handler: (value: any) => void;
-    immediate?: boolean;
-  }
-  | ((value: any) => void);
+    | {
+        handler: (value: any) => void;
+        immediate?: boolean;
+      }
+    | ((value: any) => void);
 };
 
 export interface FRProps extends AntdFormProps {
@@ -235,7 +235,7 @@ export interface FRProps extends AntdFormProps {
   /**
    * 覆盖默认的校验信息
    */
-  validateMessages?: ConfigProviderProps['form']['validateMessages'];
+  validateMessages?: Record<string, any>;
   /**
    * 展示语言，目前只支持中文、英文
    */
@@ -249,8 +249,8 @@ export interface FRProps extends AntdFormProps {
    */
   watch?: WatchProperties;
   /**
-  * 表单全局配置
-  */
+   * 表单全局配置
+   */
   globalConfig?: GlobalConfig;
   /**
    * 表单的全局共享属性
@@ -311,9 +311,8 @@ export interface SearchProps<RecordType> extends Omit<FRProps, 'form'> {
   afterSearch?: (params: any) => any;
   widgets?: any;
   form?: any;
-  [key: string]: any
+  [key: string]: any;
 }
-
 
 declare const FR: React.FC<FRProps>;
 

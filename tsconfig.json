@@ -12,15 +12,9 @@
     // "strict": true,
     "declaration": true,
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@@/*": [
-        "src/.umi/*"
-      ],
-      "form-render": [
-        "src/*"
-      ],
+      "@/*": ["src/*"],
+      "@@/*": ["src/.umi/*"],
+      "form-render": ["src/*"]
     },
     "allowJs": true,
     "allowSyntheticDefaultImports": true,

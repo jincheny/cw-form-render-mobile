@@ -31,7 +31,7 @@ const schema = {
     input: {
       title: '输入框',
       type: 'string',
-      widget: 'input'
+      widget: 'input',
     },
     radio: {
       title: '单选',
@@ -41,27 +41,20 @@ const schema = {
         options: [
           { label: '早', value: 'a' },
           { label: '中', value: 'b' },
-          { label: '晚', value: 'c' }
-        ]
-      }
-    }
-  }
+          { label: '晚', value: 'c' },
+        ],
+      },
+    },
+  },
 };
-
 
 export default () => {
   const form = useForm();
 
-  const onFinish = (formData) => {
+  const onFinish = formData => {
     console.log('formData:', formData);
   };
 
-  return (
-    <FormRender 
-      form={form} 
-      schema={schema} 
-      onFinish={onFinish}
-    />
-  );
-}
+  return <FormRender form={form} schema={schema} onFinish={onFinish} />;
+};
 ```

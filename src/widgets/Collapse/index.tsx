@@ -16,4 +16,4 @@ export default ({ schema, addons, renderCore, ...props }) => {
       })}
     </Collapse>
   );
-}
+};

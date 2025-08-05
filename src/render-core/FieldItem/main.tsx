@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useRef, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useEffect,
+  useState,
+} from 'react';
 import { Form, Grid, FormItemProps } from 'antd-mobile';
 import { useStore } from 'zustand';
 import classnames from 'classnames';
@@ -20,11 +26,12 @@ const valuePropNameMap = {
   checkbox: 'checked',
   switch: 'checked',
   Checkbox: 'checked',
-  Switch: 'checked'
+  Switch: 'checked',
 };
 
 export default (props: any) => {
-  const { store, schema, path, children, dependValues, rootPath, renderCore } = props;
+  const { store, schema, path, children, dependValues, rootPath, renderCore } =
+    props;
 
   if (schema?.hidden) {
     return null;
@@ -38,7 +45,17 @@ export default (props: any) => {
   const configCtx = useContext(ConfigContext);
 
   const { form, widgets, methods, globalProps }: any = configCtx;
-  const { hidden, properties, dependencies, inlineMode: _inlineMode, remove, removeText, visible = true, layout, ...otherSchema } = schema;
+  const {
+    hidden,
+    properties,
+    dependencies,
+    inlineMode: _inlineMode,
+    remove,
+    removeText,
+    visible = true,
+    layout,
+    ...otherSchema
+  } = schema;
   const getValueFromKey = getParamValue(formCtx, upperCtx, schema);
 
   useEffect(() => {
@@ -51,8 +68,7 @@ export default (props: any) => {
     }
   }, [fieldRef.current]);
 
-
-  let Widget = getWidget(widgets, schema.widget, schema)
+  let Widget = getWidget(widgets, schema.widget, schema);
 
   const fieldProps = getFieldProps(schema, {
     widgets,
@@ -62,22 +78,18 @@ export default (props: any) => {
     globalProps,
     path: getPath(path),
     rootPath,
-    fieldRef
+    fieldRef,
   });
 
   const displayType = getValueFromKey('displayType');
   const labelWidth = getValueFromKey('labelWidth');
 
   if (['collapse'].includes(schema.widget)) {
-    return <Widget {...fieldProps} renderCore={renderCore} />
+    return <Widget {...fieldProps} renderCore={renderCore} />;
   }
 
   if (children) {
-    fieldProps.children = (
-      <Grid columns={1}>
-        {children}
-      </Grid>
-    );
+    fieldProps.children = <Grid columns={1}>{children}</Grid>;
 
     return (
       <UpperContext.Provider
@@ -111,7 +123,8 @@ export default (props: any) => {
   const ruleList = getRuleList(schema, form, methods, fieldRef);
   const readOnly = getValueFromKey('readOnly');
   const disabled = getValueFromKey('disabled');
-  const valuePropName = schema.valuePropName || valuePropNameMap[schema.widget] || undefined;
+  const valuePropName =
+    schema.valuePropName || valuePropNameMap[schema.widget] || undefined;
 
   if (readOnly) {
     fieldProps.readOnly = readOnly;
@@ -135,7 +148,7 @@ export default (props: any) => {
     name: path,
     initialValue: defaultValue,
     rules: readOnly ? [] : ruleList,
-    className:classnames('fr-field', {'fr-field-visibility': !visible})
+    className: classnames('fr-field', { 'fr-field-visibility': !visible }),
   };
 
   if (layout) {
@@ -162,4 +175,4 @@ export default (props: any) => {
       </Form.Item>
     </Grid.Item>
   );
-}
+};

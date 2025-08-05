@@ -3,20 +3,24 @@ import { ConfigProvider } from 'antd-mobile';
 import dayjs from 'dayjs';
 import { useUnmount } from 'ahooks';
 
-import enUS from 'antd-mobile/es/locales/en-US'
-import zhCN from 'antd-mobile/es/locales/zh-CN'
+import enUS from 'antd-mobile/es/locales/en-US';
+import zhCN from 'antd-mobile/es/locales/zh-CN';
 import locales from './locales';
 import 'dayjs/locale/zh-cn';
 
 import { createStore } from './models/store';
 import { FRContext, ConfigContext } from './models/context';
-import { validateMessagesEN, validateMessagesCN } from 'form-render/es/models/validateMessage';
+import {
+  validateMessagesEN,
+  validateMessagesCN,
+} from 'form-render/es/models/validateMessage';
 import * as defaultWidgets from './widgets';
 import { FRProps } from './type';
 
-export default function withProvider<T>(Element: React.ComponentType<T>): React.FC<FRProps> {
+export default function withProvider<T>(
+  Element: React.ComponentType<T>
+): React.FC<FRProps> {
   return (props: any) => {
-
     const {
       configProvider,
       locale = 'zh-CN',
@@ -50,7 +54,8 @@ export default function withProvider<T>(Element: React.ComponentType<T>): React.
     }
 
     const antdLocale = locale === 'zh-CN' ? zhCN : enUS;
-    const formValidateMessages = locale === 'zh-CN' ? validateMessagesCN : validateMessagesEN;
+    const formValidateMessages =
+      locale === 'zh-CN' ? validateMessagesCN : validateMessagesEN;
 
     const configContext = {
       locale,
@@ -58,13 +63,13 @@ export default function withProvider<T>(Element: React.ComponentType<T>): React.
       methods,
       form,
       globalProps,
-      globalConfig
+      globalConfig,
     };
 
     const langPack: any = {
       ...antdLocale,
-      "FormRender": locales[locale],
-      ...configProvider?.locale
+      FormRender: locales[locale],
+      ...configProvider?.locale,
     };
 
     return (
@@ -74,8 +79,8 @@ export default function withProvider<T>(Element: React.ComponentType<T>): React.
         form={{
           validateMessages: {
             ...formValidateMessages,
-            ...validateMessages
-          }
+            ...validateMessages,
+          },
         }}
       >
         <ConfigContext.Provider value={configContext}>

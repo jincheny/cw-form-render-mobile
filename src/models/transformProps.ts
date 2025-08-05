@@ -6,7 +6,7 @@ const displayTypeEnum = {
   inline: 'inline',
 };
 
-const transformProps =  (props: any) => {
+const transformProps = (props: any) => {
   const {
     schema,
     beforeFinish,
@@ -65,7 +65,7 @@ const transformProps =  (props: any) => {
     logOnSubmit,
     labelCol,
     fieldCol,
-    maxWidth
+    maxWidth,
   };
 };
 

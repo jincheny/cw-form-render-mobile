@@ -3,7 +3,6 @@ import { _get, isObject, getArray, isArray, isNumber } from '../../utils';
 
 // return dataIndex、dataPath、schemaPath
 const getPathObj = ({ rootPath = [], path }) => {
-
   const pathList = (path || '').split('.');
   const dataIndex: any[] = [];
   const schemaIndex: any[] = [];
@@ -16,7 +15,7 @@ const getPathObj = ({ rootPath = [], path }) => {
       return;
     }
 
-    if (isNumber(rootPath[index+1])) {
+    if (isNumber(rootPath[index + 1])) {
       schemaIndex.push(`${item}[]`);
     } else {
       schemaIndex.push(item);
@@ -30,9 +29,9 @@ const getPathObj = ({ rootPath = [], path }) => {
 
   list.forEach((item: any, index: number) => {
     if (isNumber(item)) {
-      dataPathList.push(`[${item}]`)
+      dataPathList.push(`[${item}]`);
     } else {
-      dataPathList.push(item)
+      dataPathList.push(item);
     }
   });
 
@@ -50,7 +49,7 @@ const getPathObj = ({ rootPath = [], path }) => {
   return {
     dataIndex,
     dataPath,
-    schemaPath
+    schemaPath,
   };
 };
 
@@ -65,16 +64,21 @@ export const getPath = (path: any) => {
   return path;
 };
 
-export const getLabel = (schema: any, displayType: string, widgets: any, addons: any) => {
+export const getLabel = (
+  schema: any,
+  displayType: string,
+  widgets: any,
+  addons: any
+) => {
   const { title, description, descWidget, labelWidget } = schema;
 
   const LabelNode = widgets[labelWidget];
 
   if (LabelNode) {
-    return <LabelNode schema={schema} addons={addons} />
+    return <LabelNode schema={schema} addons={addons} />;
   }
 
-  if ((!description && !descWidget)) {
+  if (!description && !descWidget) {
     return title;
   }
 
@@ -85,11 +89,7 @@ export const getLabel = (schema: any, displayType: string, widgets: any, addons:
     }
 
     if (description) {
-      return (
-        <span className='fr-desc ml2'>
-          ({description})
-        </span>
-      )
+      return <span className="fr-desc ml2">({description})</span>;
     }
     return null;
   };
@@ -103,9 +103,8 @@ export const getLabel = (schema: any, displayType: string, widgets: any, addons:
       {title}
       <RenderDesc />
     </>
-  )
+  );
 };
-
 
 export const getExtraView = (extraKey: string, schema: any, widgets: any) => {
   const extra = schema[extraKey];
@@ -123,7 +122,6 @@ export const getExtraView = (extraKey: string, schema: any, widgets: any) => {
     return <Widget schema={schema} />;
   }
 
-
   let __html = '';
   if (typeof extra === 'string') {
     __html = extra;
@@ -138,24 +136,34 @@ export const getExtraView = (extraKey: string, schema: any, widgets: any) => {
   }
 
   return (
-    <div
-      className='fr-form-item-extra'
-      dangerouslySetInnerHTML={{ __html }}
-    />
-  )
-}
-
-
-export const getParamValue = (formCtx: any, upperCtx: any, schema: any) => (valueKey: string, isTop = true) => {
-  if (isTop) {
-    return schema[valueKey] ?? upperCtx[valueKey] ?? formCtx[valueKey];
-  }
-  return schema[valueKey] ?? upperCtx[valueKey];
+    <div className="fr-form-item-extra" dangerouslySetInnerHTML={{ __html }} />
+  );
 };
 
-export const getFieldProps = (schema: any, { widgets, methods, form, dependValues, globalProps, path, rootPath, fieldRef }) => {
+export const getParamValue =
+  (formCtx: any, upperCtx: any, schema: any) =>
+  (valueKey: string, isTop = true) => {
+    if (isTop) {
+      return schema[valueKey] ?? upperCtx[valueKey] ?? formCtx[valueKey];
+    }
+    return schema[valueKey] ?? upperCtx[valueKey];
+  };
+
+export const getFieldProps = (
+  schema: any,
+  {
+    widgets,
+    methods,
+    form,
+    dependValues,
+    globalProps,
+    path,
+    rootPath,
+    fieldRef,
+  }
+) => {
   const pathObj = getPathObj({ path, rootPath });
- 
+
   const fieldProps = {
     ...schema.props,
     addons: {
@@ -163,8 +171,8 @@ export const getFieldProps = (schema: any, { widgets, methods, form, dependValue
       globalProps,
       dependValues,
       fieldRef,
-      ...pathObj
-    }
+      ...pathObj,
+    },
   };
 
   if (dependValues?.length > 0) {
@@ -181,7 +189,8 @@ export const getFieldProps = (schema: any, { widgets, methods, form, dependValue
   if (schema.enum && !schema.props?.options) {
     const { enum: enums, enumNames } = schema;
     fieldProps.options = getArray(enums).map((item: any, index: number) => {
-      let label = enumNames && Array.isArray(enumNames) ? enumNames[index] : item;
+      let label =
+        enumNames && Array.isArray(enumNames) ? enumNames[index] : item;
       const isHtml = typeof label === 'string' && label[0] === '<';
       if (isHtml) {
         label = <span dangerouslySetInnerHTML={{ __html: label }} />;
@@ -219,31 +228,35 @@ export const getFieldProps = (schema: any, { widgets, methods, form, dependValue
   return fieldProps;
 };
 
-
 /*
-   * Get depend values
-   *
-   * 1. normal path
-   * Just get value of path in formData
-   *
-   * 2. list path
-   * Like `list[].foo`.`[]` means the same index as the current item.
-   * You can pass `[index]` to get specific item at the index of list, such as `list[1].foo`.
-   * Support more complex path like `list[].foo[].bar`
-   */
-export const getDependValues = (formData: any, dependPath: string, props: any, dependencieItem: any[]) => {
-  const indexReg =/\[[0-9]*\]/;
+ * Get depend values
+ *
+ * 1. normal path
+ * Just get value of path in formData
+ *
+ * 2. list path
+ * Like `list[].foo`.`[]` means the same index as the current item.
+ * You can pass `[index]` to get specific item at the index of list, such as `list[1].foo`.
+ * Support more complex path like `list[].foo[].bar`
+ */
+export const getDependValues = (
+  formData: any,
+  dependPath: string,
+  props: any,
+  dependencieItem: any[]
+) => {
+  const indexReg = /\[[0-9]*\]/;
 
   if (indexReg.test(dependPath)) {
-    const currentIndex = _get(props, 'path.0')
+    const currentIndex = _get(props, 'path.0');
     const dependIndex = dependPath
       .match(indexReg)[0]
       .replace('[', '')
-      .replace(']', '')
+      .replace(']', '');
 
     const listPath = dependPath.split(indexReg)[0];
     const itemIndex = dependIndex || currentIndex;
-    const itemPath = dependPath.replace(`${listPath}[${dependIndex}].`, '')
+    const itemPath = dependPath.replace(`${listPath}[${dependIndex}].`, '');
     const listData = _get(formData, `${listPath}[${itemIndex}]`);
 
     dependencieItem.push(listPath, itemIndex);
@@ -254,4 +267,4 @@ export const getDependValues = (formData: any, dependPath: string, props: any, d
   dependencieItem.push(...dependPath.split('.'));
 
   return _get(formData, dependPath);
-}
+};

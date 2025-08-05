@@ -1,4 +1,15 @@
-import { set, get, cloneDeep, has as _has, merge, isUndefined, omitBy, mergeWith, some } from 'lodash-es';
+import {
+  set,
+  get,
+  cloneDeep,
+  has as _has,
+  merge,
+  isUndefined,
+  omitBy,
+  mergeWith,
+  some,
+} from 'lodash-es';
+import dayjs from 'dayjs';
 
 export const _set = set;
 export const _get = get;
@@ -16,7 +27,7 @@ const strToUpperCase = (str: string) => {
     return '';
   }
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
+};
 
 // 首字母转小写
 const strToLowerCase = (str: string) => {
@@ -24,17 +35,17 @@ const strToLowerCase = (str: string) => {
     return '';
   }
   return str.charAt(0).toLowerCase() + str.slice(1);
-}
+};
 
 export const isObject = (data: any) => {
   const str = Object.prototype.toString.call(data);
   return str.indexOf('Object') > -1;
-}
+};
 
 export const isArray = (data: any) => {
   const str = Object.prototype.toString.call(data);
   return str.indexOf('Array') > -1;
-}
+};
 
 export const isFunction = (data: any) => typeof data === 'function';
 
@@ -45,7 +56,7 @@ export function isUrl(string: string) {
   return protocolRE.test(string);
 }
 
-export const isNumber = (str: string | number) => !isNaN(Number(str))
+export const isNumber = (str: string | number) => !isNaN(Number(str));
 
 export const getArray = (arr, defaultValue = []) => {
   if (Array.isArray(arr)) return arr;
@@ -91,11 +102,15 @@ export function getFormat(format) {
 export function isObjType(schema: any) {
   //return schema?.type === 'object' && schema.properties && !schema.widget;
   return schema?.type === 'object' && schema.properties;
-};
+}
 
 export function isListType(schema: any) {
-  return schema?.type === 'array' && isObjType(schema?.items) && schema?.enum === undefined;
-};
+  return (
+    schema?.type === 'array' &&
+    isObjType(schema?.items) &&
+    schema?.enum === undefined
+  );
+}
 
 export function isCheckBoxType(schema, readOnly) {
   if (readOnly) return false;
@@ -131,7 +146,7 @@ export const valueRemoveUndefined = (values: any, notFilter?: boolean) => {
   };
 
   const recursionObj = (_data: any) => {
-    let data =  omitBy(_data, isUndefined);
+    let data = omitBy(_data, isUndefined);
 
     Object.keys(data).forEach(key => {
       const item = data[key];
@@ -141,7 +156,9 @@ export const valueRemoveUndefined = (values: any, notFilter?: boolean) => {
 
       if (isArray(item)) {
         const result = recursionArray(item) || [];
-        data[key] = notFilter ? result : result.filter((item: any) => item !== undefined);
+        data[key] = notFilter
+          ? result
+          : result.filter((item: any) => item !== undefined);
       }
     });
 
@@ -151,23 +168,28 @@ export const valueRemoveUndefined = (values: any, notFilter?: boolean) => {
       return undefined;
     }
     return data;
-  }
+  };
 
   return recursionObj(values) || {};
-}
+};
 
 export const translation = (configCtx: any) => (key: string) => {
   const locale = configCtx?.locale.FormRender;
   return locale[key];
-}
+};
 
-export const warn = (str:string, ...args: any[]) => {
+export const warn = (str: string, ...args: any[]) => {
   if (process.env.NODE_ENV === 'development') {
     console.error('[form-render-mobile]:', str, ...args);
   }
-}
+};
 
-export const getWidget = (widgets: any, widgetName: string, schema: any, readOnly?: boolean) => {
+export const getWidget = (
+  widgets: any,
+  widgetName: string,
+  schema: any,
+  readOnly?: boolean
+) => {
   let widget = widgets[strToLowerCase(widgetName)];
   if (!widget) {
     widget = widgets[strToUpperCase(widgetName)];
@@ -176,15 +198,18 @@ export const getWidget = (widgets: any, widgetName: string, schema: any, readOnl
   if (!widget) {
     widget = widgets['Html'] || widgets['html'];
     if (!readOnly) {
-      warn(`Can not find widget component named ${widgetName}, please check the schema and widgets`, schema);
+      warn(
+        `Can not find widget component named ${widgetName}, please check the schema and widgets`,
+        schema
+      );
     }
   }
 
   return widget || null;
-}
+};
 
 export const hasFuncProperty = (obj: any) => {
-  return some(obj, (value) => {
+  return some(obj, value => {
     if (isFunction(value)) {
       return true;
     }
@@ -195,3 +220,8 @@ export const hasFuncProperty = (obj: any) => {
   });
 };
 
+export function parseToDate(value: any, format?: string) {
+  if (value === null || value === undefined || value === '') return undefined;
+  const d = format ? dayjs(value, format) : dayjs(value);
+  return d.isValid() ? d.toDate() : undefined;
+}

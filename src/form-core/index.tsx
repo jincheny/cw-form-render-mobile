@@ -17,7 +17,7 @@ import {
   yymmdd,
   msToTime,
   getSessionItem,
-  setSessionItem
+  setSessionItem,
 } from 'form-render/es/models/formCoreUtils';
 import RenderCore from '../render-core';
 
@@ -74,13 +74,13 @@ const FormCore = (props: any) => {
       displayType,
       labelCol,
       fieldCol,
-      maxWidth
+      maxWidth,
     };
     setContext(context);
   }, [column, labelCol, fieldCol, displayType, labelWidth, maxWidth, readOnly]);
 
   const initial = async () => {
-    onMount && await onMount();
+    onMount && (await onMount());
     onMountLogger();
     setTimeout(() => {
       const values = form.getValues();
@@ -90,7 +90,7 @@ const FormCore = (props: any) => {
 
   const onMountLogger = () => {
     const start = new Date().getTime();
-    if (isFunction(logOnMount)|| isFunction(logOnSubmit)) {
+    if (isFunction(logOnMount) || isFunction(logOnSubmit)) {
       setSessionItem('FORM_MOUNT_TIME', start);
       setSessionItem('FORM_START', start);
     }
@@ -117,7 +117,7 @@ const FormCore = (props: any) => {
     if (!isFunction(logOnSubmit)) {
       return;
     }
-   
+
     const start = getSessionItem('FORM_START');
     const mount = getSessionItem('FORM_MOUNT_TIME');
 
@@ -155,7 +155,9 @@ const FormCore = (props: any) => {
 
   const transFormValues = (_values: any) => {
     let values = cloneDeep(_values);
-    values = removeHiddenData ? filterValuesHidden(values, flattenSchema) : cloneDeep(form.getFieldsValue(true));
+    values = removeHiddenData
+      ? filterValuesHidden(values, flattenSchema)
+      : cloneDeep(form.getFieldsValue(true));
     values = parseValuesToBind(values, flattenSchema);
     values = filterValuesUndefined(values);
     return values;
@@ -163,7 +165,9 @@ const FormCore = (props: any) => {
 
   const handleFinish = async (_values: any) => {
     const values = transFormValues(_values);
-    const fieldsError = beforeFinish ? await beforeFinish({ data: values, schema, errors: [] }) : null;
+    const fieldsError = beforeFinish
+      ? await beforeFinish({ data: values, schema, errors: [] })
+      : null;
     // console.log(values, form.getValues(true), _values);
     if (fieldsError?.length > 0) {
       form.setFields(fieldsError);
@@ -185,7 +189,9 @@ const FormCore = (props: any) => {
   return (
     <Form
       {...formProps}
-      className={classnames('frm-form', className, { ['frm-form-card']: isCardMode })}
+      className={classnames('frm-form', className, {
+        ['frm-form-card']: isCardMode,
+      })}
       form={form}
       onFinish={handleFinish}
       onFinishFailed={handleFinishFailed}
@@ -196,6 +202,6 @@ const FormCore = (props: any) => {
       </Grid>
     </Form>
   );
-}
+};
 
 export default FormCore;
