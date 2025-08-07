@@ -51,6 +51,8 @@ export interface SchemaBase {
   readOnly?: boolean | string;
   /** 是否隐藏，隐藏的字段不会在 formData 里透出，支持 `'{{ formData.xxx === "" }}'` 形式的表达式 */
   hidden?: boolean | string;
+  /** 是否隐藏 label */
+  hiddenLabel?: boolean | string;
   displayType?: 'row' | 'column' | string;
   width?: string | number;
   labelWidth?: number | string;

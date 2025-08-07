@@ -123,6 +123,8 @@ export default (props: any) => {
   const ruleList = getRuleList(schema, form, methods, fieldRef);
   const readOnly = getValueFromKey('readOnly');
   const disabled = getValueFromKey('disabled');
+  const hiddenLabel = getValueFromKey('hiddenLabel');
+
   const valuePropName =
     schema.valuePropName || valuePropNameMap[schema.widget] || undefined;
 
@@ -137,7 +139,7 @@ export default (props: any) => {
   const defaultValue = schema.default ?? schema.defaultValue;
 
   const itemProps: FormItemProps = {
-    label,
+    label: hiddenLabel ? null : label,
     valuePropName,
     hidden,
     extra,
