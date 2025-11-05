@@ -199,6 +199,10 @@ export interface FormInstance extends AntdFormInstance {
    */
   setValues: FormInstance['setFieldsValue'];
   /**
+   * 设置扁平化的表单值（自动将扁平数据转换为嵌套结构以匹配布局容器）
+   */
+  setFlatValues: (values: any) => void;
+  /**
    * 获取表单 schema
    */
   getSchema: () => any;

@@ -1,5 +1,19 @@
 # 更新日志
 
+### 1.0.7
+
+- [+] 新增 `setFlatValues` 方法，支持显式设置扁平数据并自动转换为嵌套结构
+- [!] **重要改进**：当配置 `flattenData={true}` 时，`form.setValues()` 自动支持扁平数据，无需手动转换
+- [!] 完善扁平化数据的读写闭环：
+  - 方式一：配置 `flattenData={true}`，直接使用 `setValues/getValues`（推荐）
+  - 方式二：不配置，使用 `setFlatValues/getFlatValues`
+- [!] 典型使用场景：配置 `flattenData={true}` 后，后端返回扁平数据可直接 `form.setValues(data)` 完成回显
+
+### 1.0.6
+
+- [+] 升级 `cw-form-render` 到 1.0.2 版本
+- [!] 数据扁平化功能已完整支持，`boxCollapse` 等布局 widget 会通过 `cw-form-render` 包自动识别并扁平化
+
 ### 1.0.5
 
 - [+] 完整实现 `flattenData` 数据扁平化功能，与 `cw-form-render` PC 端保持一致

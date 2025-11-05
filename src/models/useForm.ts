@@ -207,9 +207,127 @@ const useForm = () => {
   //   handleSchemaUpdate(schema);
   // }
 
+  // 将扁平数据转换为嵌套结构（与 filterVoidContainers 相反的操作）
+  const unflattenValues = (flatValues: any, flatten: any) => {
+    if (!flatten || !flatValues || !isObject(flatValues)) {
+      return flatValues;
+    }
+
+    // 布局容器 widget 列表（这些 widget 只用于布局，不应该产生数据嵌套）
+    const layoutWidgets = [
+      'collapse',
+      'boxCollapse',
+      'card',
+      'boxcard',
+      'boxLineTitle',
+      'boxSubInline',
+      'lineTitle',
+      'subInline',
+      'box',
+      'group',
+      'fieldset'
+    ];
+
+    // 找出所有布局容器字段（type 为 void 或 widget 是布局组件或 schemaType 为 group）
+    const containerPaths = Object.keys(flatten)
+      .filter(key => {
+        const schema = flatten[key]?.schema;
+        const isVoidType = schema?.type === 'void' && !schema?.bind;
+        const isLayoutWidget = schema?.widget && layoutWidgets.includes(schema.widget);
+        const isGroupType = schema?.schemaType === 'group';
+        return isVoidType || isLayoutWidget || isGroupType;
+      })
+      .sort((a, b) => {
+        // 按路径深度排序，从浅到深处理
+        const depthA = (a.match(/\./g) || []).length;
+        const depthB = (b.match(/\./g) || []).length;
+        return depthA - depthB;
+      });
+
+    if (containerPaths.length === 0) {
+      return flatValues;
+    }
+
+    const result: any = {};
+    const processedFields = new Set<string>();
+
+    // 为每个容器路径构建嵌套结构
+    containerPaths.forEach(containerPath => {
+      // 移除 [] 标记和开头的 #
+      const cleanPath = containerPath.replace(/\[\]/g, '').replace(/^#\.?/, '');
+      if (!cleanPath) return;
+
+      const pathParts = cleanPath.split('.');
+
+      // 获取该容器下的所有子字段
+      const containerChildren = flatten[containerPath]?.children || [];
+
+      if (containerChildren.length === 0) return;
+
+      // 获取或创建容器对象的路径
+      let target = result;
+      for (let i = 0; i < pathParts.length; i++) {
+        const part = pathParts[i];
+        if (i === pathParts.length - 1) {
+          // 最后一个部分是容器本身
+          if (!target[part]) {
+            target[part] = {};
+          }
+          target = target[part];
+        } else {
+          // 中间路径
+          if (!target[part]) {
+            target[part] = {};
+          }
+          target = target[part];
+        }
+      }
+
+      // 将扁平数据中属于该容器的字段移动到容器内
+      containerChildren.forEach((childPath: string) => {
+        const childCleanPath = childPath.replace(/\[\]/g, '').replace(/^#\.?/, '');
+        const childKey = childCleanPath.split('.').pop();
+
+        if (!childKey) return;
+
+        // 如果该字段在扁平数据中存在，移动到容器内
+        if (_has(flatValues, childKey)) {
+          target[childKey] = _get(flatValues, childKey);
+          processedFields.add(childKey);
+        }
+      });
+    });
+
+    // 将未处理的字段直接复制到结果中（可能是非容器内的字段）
+    Object.keys(flatValues).forEach(key => {
+      if (!processedFields.has(key)) {
+        result[key] = flatValues[key];
+      }
+    });
+
+    return result;
+  };
+
   // 设置表单数据
   xform.setValues = (_values: any) => {
-    const values = parseBindToValues(_values, flattenSchemaRef.current);
+    let values = _values;
+
+    // 如果启用了 flattenData，自动将扁平数据转换为嵌套结构
+    const { flattenData } = storeRef.current?.getState() || {};
+    if (flattenData) {
+      values = unflattenValues(values, flattenSchemaRef.current);
+    }
+
+    values = parseBindToValues(values, flattenSchemaRef.current);
+    form.setFieldsValue(values);
+  };
+
+  // 设置扁平化的表单数据（显式转换，不依赖 flattenData 配置）
+  xform.setFlatValues = (_values: any) => {
+    // 先将扁平数据转换为嵌套结构
+    const nestedValues = unflattenValues(_values, flattenSchemaRef.current);
+    // 然后调用原生的 setFieldsValue（跳过 flattenData 判断）
+    const values = parseBindToValues(nestedValues, flattenSchemaRef.current);
     form.setFieldsValue(values);
   };
 

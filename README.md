@@ -89,7 +89,10 @@ export default () => {
 #### 扁平化相关方法（v1.0.3+）
 
 - **`getFlatValues(nameList?, filterFunc?, notFilterUndefined?)`** - 获取扁平化的表单数据，自动移除 void 类型容器（如 collapse、group 等）的数据层级
+- **`setFlatValues(values)`** - 设置扁平化的表单数据，显式将扁平数据转换为嵌套结构（不依赖 flattenData 配置）
 - **`getFlattenSchema(path?)`** - 获取扁平化的 schema
+
+> **注意：** 当表单配置了 `flattenData={true}` 时，`setValues` 会自动支持扁平数据，无需调用 `setFlatValues`
 
 #### 校验相关方法
 
@@ -139,15 +142,53 @@ form.setSchemaByName('input', {
 });
 ```
 
-#### 获取扁平化数据
+#### 扁平化数据的读写
 
 ```jsx
-// 当表单中包含 collapse、group 等布局容器时
-// getFlatValues 会自动移除这些容器的数据层级
-const flatValues = form.getFlatValues();
+// 方式一：配置 flattenData={true}（推荐）
+<FormRender 
+  form={form} 
+  schema={schema} 
+  flattenData={true}  // 启用扁平化
+  onFinish={onFinish} 
+/>
 
-// 对比：getValues 会保留容器层级
-const values = form.getValues();
+// 启用 flattenData 后，setValues/getValues 自动支持扁平数据
+const flatValues = form.getValues();
+// 返回：{ display_name: 'xxx', model_id: {...}, vendor_id: {...} }
+
+form.setValues({
+  display_name: '资产名称',
+  model_id: { sys_id: '123', name: '型号A' },
+  vendor_id: { sys_id: '456', name: '供应商B' }
+});
+// 自动转换为嵌套结构并设置到表单
+
+// 典型使用场景：从后端获取扁平数据后直接回显
+fetch('/api/asset/detail')
+  .then(res => res.json())
+  .then(data => {
+    // data 是扁平数据结构，直接使用 setValues
+    form.setValues(data);
+  });
+
+// ========================================
+
+// 方式二：不配置 flattenData，手动使用扁平化方法
+const flatValues = form.getFlatValues();  // 获取扁平数据
+// 返回：{ display_name: 'xxx', model_id: {...}, vendor_id: {...} }
+
+const values = form.getValues();  // 获取嵌套数据
+// 返回：{ 
+//   SoftwareLicense: { display_name: 'xxx', model_id: {...} },
+//   Financial: { vendor_id: {...} }
+// }
+
+form.setFlatValues({  // 显式设置扁平数据
+  display_name: '资产名称',
+  model_id: { sys_id: '123', name: '型号A' },
+  vendor_id: { sys_id: '456', name: '供应商B' }
+});
 ```
 
 #### 动态表单
