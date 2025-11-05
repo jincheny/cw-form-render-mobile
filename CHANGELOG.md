@@ -1,5 +1,9 @@
 # 更新日志
 
+### 1.0.4
+
+- [!] 修复依赖引用问题，将 `form-render` 替换为 `cw-form-render`
+
 ### 1.0.3
 
 - [+] 新增 `getValueByName` 方法，通过字段名获取表单值
