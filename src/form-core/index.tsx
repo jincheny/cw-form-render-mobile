@@ -47,6 +47,7 @@ const FormCore = (props: any) => {
     onFinishFailed,
     readOnly,
     removeHiddenData,
+    flattenData,
     logOnMount,
     logOnSubmit,
     className,
@@ -63,8 +64,8 @@ const FormCore = (props: any) => {
   }, [JSON.stringify(props.schema || {})]);
 
   useEffect(() => {
-    store.setState({ removeHiddenData });
-  }, [removeHiddenData]);
+    store.setState({ removeHiddenData, flattenData });
+  }, [removeHiddenData, flattenData]);
 
   useEffect(() => {
     const context = {
@@ -84,7 +85,8 @@ const FormCore = (props: any) => {
     onMountLogger();
     setTimeout(() => {
       const values = form.getValues();
-      immediateWatch(watch, values);
+      // @ts-ignore - 等待 cw-form-render 发布包含新签名的类型定义
+      immediateWatch(watch, values, flattenSchema, flattenData);
     }, 0);
   };
 
@@ -150,10 +152,21 @@ const FormCore = (props: any) => {
 
   const handleValuesChange = (changedValues: any, _allValues: any) => {
     const allValues = valueRemoveUndefined(_allValues, true);
-    valuesWatch(changedValues, allValues, watch);
+    // 传递 flattenSchema 和 flattenData 配置给 valuesWatch
+    // @ts-ignore - 等待 cw-form-render 发布包含新签名的类型定义
+    valuesWatch(changedValues, allValues, watch, flattenSchema, flattenData);
   };
 
   const transFormValues = (_values: any) => {
+    // 如果启用了 flattenData，直接使用 getFlatValues 获取扁平化数据
+    if (flattenData) {
+      // getFlatValues 内部会自动处理 filterValuesHidden、parseValuesToBind、filterValuesUndefined 和扁平化
+      return removeHiddenData
+        ? form.getFlatValues()
+        : form.getFlatValues(null, null, true);
+    }
+
+    // 原有逻辑：不扁平化
     let values = cloneDeep(_values);
     values = removeHiddenData
       ? filterValuesHidden(values, flattenSchema)

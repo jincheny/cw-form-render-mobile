@@ -2,6 +2,9 @@
 
 ### 1.0.5
 
+- [+] 完整实现 `flattenData` 数据扁平化功能，与 `cw-form-render` PC 端保持一致
+- [+] 支持 `watch` 监听时的智能路径匹配和数据扁平化
+- [+] 支持 `onFinish` 回调时的数据扁平化
 - [!] 修复 TypeScript 类型定义，补充 `flattenData` 配置项的类型声明
 
 ### 1.0.4
