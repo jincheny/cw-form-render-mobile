@@ -6,7 +6,7 @@ import { FRContext } from '../../models/context';
 import {
   isHasExpression,
   parseAllExpression,
-} from 'form-render/es/models/expression';
+} from 'cw-form-render/es/models/expression';
 import { getDependValues } from './module';
 import Main from './main';
 

@@ -13,7 +13,7 @@ import { FRContext, ConfigContext } from './models/context';
 import {
   validateMessagesEN,
   validateMessagesCN,
-} from 'form-render/es/models/validateMessage';
+} from 'cw-form-render/es/models/validateMessage';
 import * as defaultWidgets from './widgets';
 import { FRProps } from './type';
 

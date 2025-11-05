@@ -11,7 +11,7 @@ import classnames from 'classnames';
 
 import { _get, getWidget } from '../../utils';
 import { ConfigContext } from '../../models/context';
-import getRuleList from 'form-render/es/models/validates';
+import getRuleList from 'cw-form-render/es/models/validates';
 import FieldWrapper from './field';
 import {
   getParamValue,

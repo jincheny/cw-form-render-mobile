@@ -1,6 +1,6 @@
 import { Form, Grid } from 'antd-mobile';
 import { AddCircleOutline } from 'antd-mobile-icons';
-import { parseAllExpression } from 'form-render/es/models/expression';
+import { parseAllExpression } from 'cw-form-render/es/models/expression';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 import { ConfigContext, FRContext } from '../../models/context';
