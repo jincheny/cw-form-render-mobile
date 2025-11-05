@@ -1,6 +1,6 @@
 {
   "name": "cw-form-render-mobile",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "通过 JSON Schema 生成标准 Form，常用于自定义搭建配置界面生成",
   "keywords": [
     "Form",
@@ -33,7 +33,7 @@
     "latest": "npm publish",
     "prepare": "npm run build",
     "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
-    "postpublish": "git push --tags",
+    "postpublish": "git tag v$npm_package_version && git push --follow-tags",
     "test:ui": "vitest --ui"
   },
   "lint-staged": {
@@ -51,7 +51,7 @@
     "classnames": "^2.3.1",
     "color": "^3.1.2",
     "dayjs": "^1.11.7",
-    "form-render": "^2.3.6",
+    "cw-form-render": "1.0.0",
     "lodash-es": "^4.17.21",
     "rc-color-picker": "^1.2.6",
     "virtualizedtableforantd4": "^1.1.2",

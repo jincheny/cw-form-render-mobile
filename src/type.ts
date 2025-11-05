@@ -151,6 +151,14 @@ export interface FormInstance extends AntdFormInstance {
    */
   getSchemaByPath: (path: string) => any;
   /**
+   * 根据字段名获取 Schema（从 flattenSchema 中查找）
+   */
+  getSchemaByName: (name: string) => any;
+  /**
+   * 根据字段名动态设置 Schema（从 flattenSchema 中查找对应路径）
+   */
+  setSchemaByName: (name: string, schema: any) => any;
+  /**
    * 外部手动修改 errorFields 校验信息
    */
   setErrorFields: (errors: any[]) => void;
@@ -159,13 +167,29 @@ export interface FormInstance extends AntdFormInstance {
    */
   removeErrorField: (path: string) => any;
   /**
+   * 根据路径获取表单值
+   */
+  getValueByPath: FormInstance['getFieldValue'];
+  /**
+   * 根据字段名获取表单值（从 flattenSchema 中查找对应路径）
+   */
+  getValueByName: (name: string) => any;
+  /**
    * 根据路径修改表单值
    */
   setValueByPath: FormInstance['setFieldValue'];
   /**
+   * 根据字段名修改表单值（从 flattenSchema 中查找对应路径）
+   */
+  setValueByName: (name: string, value: any) => void;
+  /**
    * 获取表单值
    */
   getValues: FormInstance['getFieldsValue'];
+  /**
+   * 获取扁平化的表单值（自动移除 void 类型容器的层级，如 collapse、group 等布局容器）
+   */
+  getFlatValues: (nameList?: any, filterFunc?: any, notFilterUndefined?: boolean) => any;
   /**
    * 表单校验错误的数组
    */
@@ -186,6 +210,10 @@ export interface FormInstance extends AntdFormInstance {
    * 获取 field 的 ref 对象
    */
   getFieldRef: (path: string) => any;
+  /**
+   * 获取 flatten schema
+   */
+  getFlattenSchema: (path?: string) => any;
 }
 
 export type WatchProperties = {
