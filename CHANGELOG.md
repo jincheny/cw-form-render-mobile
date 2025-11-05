@@ -1,5 +1,9 @@
 # 更新日志
 
+### 1.0.5
+
+- [!] 修复 TypeScript 类型定义，补充 `flattenData` 配置项的类型声明
+
 ### 1.0.4
 
 - [!] 修复依赖引用问题，将 `form-render` 替换为 `cw-form-render`
