@@ -1,6 +1,6 @@
 {
   "name": "cw-form-render-mobile",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "通过 JSON Schema 生成标准 Form，常用于自定义搭建配置界面生成",
   "keywords": [
     "Form",
@@ -50,7 +50,7 @@
     "async-validator": "^3.5.1",
     "classnames": "^2.3.1",
     "color": "^3.1.2",
-    "cw-form-render": "1.0.1",
+    "cw-form-render": "1.0.2",
     "dayjs": "^1.11.7",
     "lodash-es": "^4.17.21",
     "rc-color-picker": "^1.2.6",
