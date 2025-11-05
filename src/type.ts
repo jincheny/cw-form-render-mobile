@@ -314,6 +314,12 @@ export interface FRProps extends AntdFormProps {
    */
   removeHiddenData?: boolean;
   /**
+   * 是否自动扁平化数据（移除 void 类型容器层级）
+   * 启用后，getValues()、watch、onFinish 等返回的数据都会自动移除 void 容器嵌套
+   * 默认 false
+   */
+  flattenData?: boolean;
+  /**
    * 扩展方法
    */
   methods?: Record<string, Function>;
