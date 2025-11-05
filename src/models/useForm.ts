@@ -26,6 +26,7 @@ import {
   valueRemoveUndefined,
   hasFuncProperty,
 } from '../utils';
+import { isLayoutContainer } from '../constants';
 
 import type { FormInstance } from '../type';
 
@@ -213,29 +214,11 @@ const useForm = () => {
       return flatValues;
     }
 
-    // 布局容器 widget 列表（这些 widget 只用于布局，不应该产生数据嵌套）
-    const layoutWidgets = [
-      'collapse',
-      'boxCollapse',
-      'card',
-      'boxcard',
-      'boxLineTitle',
-      'boxSubInline',
-      'lineTitle',
-      'subInline',
-      'box',
-      'group',
-      'fieldset'
-    ];
-
-    // 找出所有布局容器字段（type 为 void 或 widget 是布局组件或 schemaType 为 group）
+    // 找出所有布局容器字段
     const containerPaths = Object.keys(flatten)
       .filter(key => {
         const schema = flatten[key]?.schema;
-        const isVoidType = schema?.type === 'void' && !schema?.bind;
-        const isLayoutWidget = schema?.widget && layoutWidgets.includes(schema.widget);
-        const isGroupType = schema?.schemaType === 'group';
-        return isVoidType || isLayoutWidget || isGroupType;
+        return isLayoutContainer(schema);
       })
       .sort((a, b) => {
         // 按路径深度排序，从浅到深处理
@@ -335,7 +318,7 @@ const useForm = () => {
   const filterVoidContainers = (values: any, flatten: any) => {
     const voidPaths = Object.keys(flatten).filter(key => {
       const schema = flatten[key]?.schema;
-      return schema?.type === 'void' && !schema?.bind;
+      return isLayoutContainer(schema);
     });
 
     if (voidPaths.length === 0) {
@@ -387,31 +370,68 @@ const useForm = () => {
     let values = cloneDeep(
       form.getFieldsValue(getFieldName(nameList), filterFunc)
     );
-    const { removeHiddenData } = storeRef.current?.getState() || {};
-    if (removeHiddenData) {
-      values = filterValuesHidden(values, flattenSchemaRef.current);
+    const { removeHiddenData, flattenData } = storeRef.current?.getState() || {};
+
+    // 如果启用了 flattenData，需要先扁平化，让 hidden 表达式能正确访问字段值
+    if (flattenData) {
+      values = parseValuesToBind(values, flattenSchemaRef.current);
+      values = filterVoidContainers(values, flattenSchemaRef.current);
+
+      // 然后再过滤隐藏字段（此时 formData 已经是扁平结构）
+      if (removeHiddenData) {
+        values = filterValuesHidden(values, flattenSchemaRef.current);
+      }
+      values = filterValuesUndefined(values);
+    } else {
+      // 不扁平化时，按原有顺序处理
+      if (removeHiddenData) {
+        values = filterValuesHidden(values, flattenSchemaRef.current);
+      }
+      values = filterValuesUndefined(values);
+      values = parseValuesToBind(values, flattenSchemaRef.current);
     }
-    values = filterValuesUndefined(values);
-    return parseValuesToBind(values, flattenSchemaRef.current);
+
+    return values;
   };
 
   // 获取扁平化的表单数据（自动移除 void 类型容器的层级，如 collapse、group 等布局容器）
   xform.getFlatValues = (nameList?: any, filterFunc?: any, notFilterUndefined?: boolean) => {
     let values = cloneDeep(form.getFieldsValue(getFieldName(nameList), filterFunc));
     const { removeHiddenData } = storeRef.current?.getState() || {};
+
+    // 先扁平化
+    values = parseValuesToBind(values, flattenSchemaRef.current);
+    values = filterVoidContainers(values, flattenSchemaRef.current);
+
+    // 然后再过滤隐藏字段（此时 formData 已经是扁平结构，hidden 表达式能正确访问字段值）
     if (removeHiddenData) {
       values = filterValuesHidden(values, flattenSchemaRef.current);
     }
     if (!notFilterUndefined) {
       values = filterValuesUndefined(values);
     }
-    values = parseValuesToBind(values, flattenSchemaRef.current);
-    // 移除 void 类型容器的数据层级
-    values = filterVoidContainers(values, flattenSchemaRef.current);
+
     return values;
   };
 
   xform.setValueByPath = (path: any, value: any) => {
+    const { flattenData } = storeRef.current?.getState() || {};
+
+    // 如果启用了 flattenData，且路径不包含 '.'，尝试在 flattenSchema 中查找完整路径
+    if (flattenData && typeof path === 'string' && !path.includes('.')) {
+      // 在 flattenSchema 中查找匹配的字段
+      for (const key in flattenSchemaRef.current) {
+        const cleanKey = key.replace(/\[\]/g, '').replace(/^#\.?/, '');
+        // 如果字段路径以 path 结尾（如 SoftwareLicense.state_dict 以 state_dict 结尾）
+        if (cleanKey === path || cleanKey.endsWith('.' + path)) {
+          const name = getFieldName(cleanKey);
+          form.setFieldValue(name, value);
+          return;
+        }
+      }
+    }
+
+    // 否则按原有逻辑处理
     const name = getFieldName(path);
     form.setFieldValue(name, value);
   };
@@ -422,13 +442,29 @@ const useForm = () => {
       console.warn('请输入正确的字段名');
       return;
     }
-    const flattenItem = flattenSchemaRef.current?.[name];
+
+    // 尝试直接从 flattenSchema 中查找（带 # 前缀）
+    let flattenItem = flattenSchemaRef.current?.[name] || flattenSchemaRef.current?.[`#.${name}`];
+
+    // 如果没找到，尝试在所有键中查找匹配的
+    if (!flattenItem) {
+      for (const key in flattenSchemaRef.current) {
+        const cleanKey = key.replace(/\[\]/g, '').replace(/^#\.?/, '');
+        if (cleanKey === name || cleanKey.endsWith('.' + name)) {
+          flattenItem = flattenSchemaRef.current[key];
+          name = cleanKey;
+          break;
+        }
+      }
+    }
+
     if (!flattenItem) {
       console.warn(`未找到字段名为 ${name} 的 schema`);
       return;
     }
-    // 将 name 转换为路径，去掉 []
-    const path = name === '#' ? '' : name.replace(/\[\]/g, '');
+
+    // 将 name 转换为路径，去掉 # 和 []
+    const path = name.replace(/^#\.?/, '').replace(/\[\]/g, '');
     if (!path) {
       console.warn('根节点不支持通过 setValueByName 修改');
       return;
@@ -437,6 +473,22 @@ const useForm = () => {
   };
 
   xform.getValueByPath = (path: string) => {
+    const { flattenData } = storeRef.current?.getState() || {};
+
+    // 如果启用了 flattenData，且路径不包含 '.'，尝试在 flattenSchema 中查找完整路径
+    if (flattenData && typeof path === 'string' && !path.includes('.')) {
+      // 在 flattenSchema 中查找匹配的字段
+      for (const key in flattenSchemaRef.current) {
+        const cleanKey = key.replace(/\[\]/g, '').replace(/^#\.?/, '');
+        // 如果字段路径以 path 结尾
+        if (cleanKey === path || cleanKey.endsWith('.' + path)) {
+          const name = getFieldName(cleanKey);
+          return form.getFieldValue(name);
+        }
+      }
+    }
+
+    // 否则按原有逻辑处理
     const name = getFieldName(path);
     return form.getFieldValue(name);
   };
@@ -447,13 +499,29 @@ const useForm = () => {
       console.warn('请输入正确的字段名');
       return;
     }
-    const flattenItem = flattenSchemaRef.current?.[name];
+
+    // 尝试直接从 flattenSchema 中查找（带 # 前缀）
+    let flattenItem = flattenSchemaRef.current?.[name] || flattenSchemaRef.current?.[`#.${name}`];
+
+    // 如果没找到，尝试在所有键中查找匹配的
+    if (!flattenItem) {
+      for (const key in flattenSchemaRef.current) {
+        const cleanKey = key.replace(/\[\]/g, '').replace(/^#\.?/, '');
+        if (cleanKey === name || cleanKey.endsWith('.' + name)) {
+          flattenItem = flattenSchemaRef.current[key];
+          name = cleanKey;
+          break;
+        }
+      }
+    }
+
     if (!flattenItem) {
       console.warn(`未找到字段名为 ${name} 的 schema`);
       return;
     }
-    // 将 name 转换为路径，去掉 []
-    const path = name === '#' ? '' : name.replace(/\[\]/g, '');
+
+    // 将 name 转换为路径，去掉 # 和 []
+    const path = name.replace(/^#\.?/, '').replace(/\[\]/g, '');
     if (!path) {
       return form.getFieldsValue();
     }

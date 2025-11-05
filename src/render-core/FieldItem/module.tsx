@@ -238,12 +238,16 @@ export const getFieldProps = (
  * Like `list[].foo`.`[]` means the same index as the current item.
  * You can pass `[index]` to get specific item at the index of list, such as `list[1].foo`.
  * Support more complex path like `list[].foo[].bar`
+ *
+ * 3. flattened field (when flattenData is enabled)
+ * If the field is not found at the direct path, search in all containers
  */
 export const getDependValues = (
   formData: any,
   dependPath: string,
   props: any,
-  dependencieItem: any[]
+  dependencieItem: any[],
+  flattenSchema?: any
 ) => {
   const indexReg = /\[[0-9]*\]/;
 
@@ -261,10 +265,31 @@ export const getDependValues = (
 
     dependencieItem.push(listPath, itemIndex);
 
-    return getDependValues(listData, itemPath, props, dependencieItem);
+    return getDependValues(listData, itemPath, props, dependencieItem, flattenSchema);
   }
 
   dependencieItem.push(...dependPath.split('.'));
 
-  return _get(formData, dependPath);
+  // 先尝试直接获取
+  let value = _get(formData, dependPath);
+
+  // 如果找不到值且提供了 flattenSchema，尝试在所有容器中查找
+  if (value === undefined && flattenSchema) {
+    // 遍历 flattenSchema，查找匹配的字段
+    for (const key in flattenSchema) {
+      const cleanKey = key.replace(/\[\]/g, '').replace(/^#\.?/, '');
+      // 如果字段路径以 dependPath 结尾（如 SoftwareLicense.model_category_id 以 model_category_id 结尾）
+      if (cleanKey.endsWith(dependPath) || cleanKey.endsWith('.' + dependPath)) {
+        value = _get(formData, cleanKey);
+        if (value !== undefined) {
+          // 更新 dependencieItem 为实际路径
+          dependencieItem.length = 0;
+          dependencieItem.push(...cleanKey.split('.'));
+          break;
+        }
+      }
+    }
+  }
+
+  return value;
 };
