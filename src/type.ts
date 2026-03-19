@@ -189,7 +189,11 @@ export interface FormInstance extends AntdFormInstance {
   /**
    * 获取扁平化的表单值（自动移除 void 类型容器的层级，如 collapse、group 等布局容器）
    */
-  getFlatValues: (nameList?: any, filterFunc?: any, notFilterUndefined?: boolean) => any;
+  getFlatValues: (
+    nameList?: any,
+    filterFunc?: any,
+    notFilterUndefined?: boolean
+  ) => any;
   /**
    * 表单校验错误的数组
    */
@@ -271,9 +275,9 @@ export interface FRProps extends AntdFormProps {
    */
   validateMessages?: Record<string, any>;
   /**
-   * 展示语言，目前只支持中文、英文
+   * 展示语言，目前只支持中文、英文、日文和繁体中文
    */
-  locale?: 'zh-CN' | 'en-US';
+  locale?: 'zh-CN' | 'en-US' | 'ja-JP' | 'zh-TW';
   /**
    * 数据会作为 beforeFinish 的第四个参数传入
    */
